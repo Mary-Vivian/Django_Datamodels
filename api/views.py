@@ -15,7 +15,14 @@ from rest_framework import status
 class StudentListView(APIView):
     def get(self, request):
         students = Student.objects.all()
+        first_name=request.query_params.get("first_name")
+        if first_name:
+           students=students.filter(first_name=first_name)
         serializer = StudentSerializer(students, many=True)
+        country=request.query_params.get("country")
+        if country:
+            country=students.filter(country=country)
+        serializer = StudentSerializer(country, many=True)
         return Response(serializer.data)
     def post(self,request):
         serializer=StudentSerializer(data=request.data)
@@ -24,6 +31,7 @@ class StudentListView(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+        
         
 class StudentDetailview(APIView):
      def put(self,request,id):
@@ -34,10 +42,23 @@ class StudentDetailview(APIView):
            return Response(serializer.data,status=status.HTTP_201_CREATED)
        else:
            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+     def enroll(self, student,course_code):
+         course=Courses.objects.get(id=course_code)
+         student.course.add(course)
+
+     def post(self,request,id):
+         student=Student.objects.get(id=id)
+         action=request.data.get("action")
+         if action=="email":
+            course_code=request.data.get(course_code) 
+            self.enroll(student,course_code)
+         return Response(status=status.HTTP_201_CREATED)      
+
      def delete(self,request,id):
        student=Student.objects.get(id=id)
        student.delete()
-       return Response(status=status.HTTP_202_ACCEPTED)   
+       return Response(status=status.HTTP_202_ACCEPTED)  
+      
    
    
 class CoursesListView(APIView):
@@ -144,7 +165,8 @@ class ClassPeriodDetailview(APIView):
    def delete(self,request,id):
        classPeriod=ClassPeriod.objects.get(id=id)
        classPeriod.delete()
-       return Response(status=status.HTTP_202_ACCEPTED)         
+       return Response(status=status.HTTP_202_ACCEPTED) 
+       
 
                      
         

@@ -6,6 +6,7 @@ class Student(models.Model):
     email = models.EmailField(max_length=254)
     code = models.PositiveSmallIntegerField()
     date_of_birth = models.DateField()
+    courses=models.TextField()
     country = models.CharField(max_length=20)
     bio = models.TextField()
 
