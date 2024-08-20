@@ -1,16 +1,16 @@
 from django.db import models
-
+from teacher.models import Teacher
+from courses.models import Courses
 
 class Classes(models.Model):
-    class_id = models.PositiveSmallIntegerField(primary_key=True)
-    room_number = models.CharField(max_length=20)
-    teacher_allocated = models.CharField(max_length=20)
-    course_tought = models.CharField(max_length=20)
-    course_start_time = models.TimeField()
-    course_end_time = models.TimeField()
-    course_day_of_week = models.CharField(max_length=20)
-    seating_arrangement = models.TextField()
-    equipment = models.TextField()
-    def __str__(self) -> str:
-        return f"{self.teacher_allocated} teaches {self.course_tought}"
-    
+    id = models.AutoField(primary_key=True)  
+    class_name = models.CharField(max_length=20, default='Default Class Name')
+    number_of_seats = models.IntegerField(default=0)  
+    number_of_students = models.IntegerField(default=0)
+    class_teacher = models.ForeignKey(Teacher, on_delete=models.SET_NULL, null=True, related_name='classes')
+    courses = models.ManyToManyField(Courses, related_name='classes')  
+    available_equipments = models.TextField()
+    description = models.TextField(default='No description available')
+
+    def __str__(self):
+        return f"{self.class_name} {self.class_teacher}"
